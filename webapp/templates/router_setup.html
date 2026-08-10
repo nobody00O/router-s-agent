@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Register your router / network specs</h2>
+  <p style="color:#9fb3c8; font-size:0.85rem;">These stay on this platform and are used only to check YOUR scan reports against YOUR expectations — nothing here is shared or scanned on your behalf without the local agent you control.</p>
+  <form method="POST">
+    <label>Router model (optional, for your own reference)</label>
+    <input type="text" name="router_model" value="{{ existing.router_model if existing else '' }}" placeholder="e.g. TP-Link Archer AX21">
+
+    <label>Subnet (CIDR notation)</label>
+    <input type="text" name="subnet" value="{{ existing.subnet if existing else '192.168.1.0/24' }}" required>
+
+    <label>Network interface (the NIC the local agent should scan on)</label>
+    <input type="text" name="interface" value="{{ existing.interface if existing else 'wlan0' }}" required>
+
+    <label>Router IP address</label>
+    <input type="text" name="router_ip" value="{{ existing.router_ip if existing else '192.168.1.1' }}" required>
+
+    <label>Known devices — MAC address (one row per device)</label>
+    {% set devices = existing.known_devices if existing else [{}] %}
+    <div id="deviceRows">
+      {% for d in devices %}
+      <div style="display:flex; gap:0.5rem;">
+        <input type="text" name="device_mac" placeholder="AA:BB:CC:11:22:33" value="{{ d.mac if d else '' }}">
+        <input type="text" name="device_name" placeholder="Device name (e.g. My Laptop)" value="{{ d.name if d else '' }}">
+      </div>
+      {% endfor %}
+    </div>
+    <button type="button" onclick="addDeviceRow()" style="background:#333; margin-bottom:1rem;">+ Add another device</button>
+
+    <label>Tracker/telemetry blocklist domains (comma-separated)</label>
+    <input type="text" name="blocklist_domains" value="{{ existing.blocklist_domains|join(', ') if existing else 'telemetry.example-vendor.com, analytics.example-tracker.net' }}">
+
+    <button type="submit">Save configuration</button>
+  </form>
+</div>
+
+<script>
+function addDeviceRow() {
+  const container = document.getElementById('deviceRows');
+  const row = document.createElement('div');
+  row.style.display = 'flex';
+  row.style.gap = '0.5rem';
+  row.innerHTML = `<input type="text" name="device_mac" placeholder="AA:BB:CC:11:22:33">
+                    <input type="text" name="device_name" placeholder="Device name">`;
+  container.appendChild(row);
+}
+</script>
+{% endblock %}

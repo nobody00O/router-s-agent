@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+{% if not has_config %}
+<div class="card">
+  <p>You haven't registered your router yet. <a href="{{ url_for('router_setup') }}" style="color:#3462ff;">Set it up here</a>, then <a href="{{ url_for('agent_download') }}" style="color:#3462ff;">download the local agent</a> to start scanning.</p>
+</div>
+{% else %}
+<div class="card">
+  <h2>Devices seen on your network (<span id="deviceCount">0</span>)</h2>
+  <table>
+    <thead><tr><th>IP</th><th>MAC</th></tr></thead>
+    <tbody id="deviceBody"></tbody>
+  </table>
+</div>
+<div class="card">
+  <h2>Alerts (<span id="alertCount">0</span>)</h2>
+  <table>
+    <thead><tr><th>Severity</th><th>Rule</th><th>Message</th></tr></thead>
+    <tbody id="alertBody"></tbody>
+  </table>
+</div>
+<script>
+async function refresh() {
+  const data = await (await fetch('/api/dashboard-data')).json();
+  document.getElementById('deviceCount').innerText = data.devices.length;
+  document.getElementById('deviceBody').innerHTML = data.devices.map(d =>
+    `<tr><td>${d.ip}</td><td>${d.mac}</td></tr>`).join('');
+
+  document.getElementById('alertCount').innerText = data.alerts.length;
+  document.getElementById('alertBody').innerHTML = data.alerts.map(a =>
+    `<tr><td class="${a.severity}">${a.severity}</td><td>${a.rule}</td><td>${a.message}</td></tr>`).join('');
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+{% endif %}
+{% endblock %}
