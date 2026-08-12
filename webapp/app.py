@@ -21,7 +21,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, request, session, redirect, url_for, jsonify, render_template, flash
 
 from webapp.db import init_db, DB_PATH
-from webapp.auth import signup as do_signup, login as do_login, AuthError, get_user_by_api_key, regenerate_api_key
+from webapp.auth import (signup as do_signup, login as do_login, AuthError, get_user_by_api_key,
+                          regenerate_api_key, verify_email_token, resend_verification)
+from webapp.email_sender import send_verification_email
 from webapp.router_config import save_router_config, get_router_config, ConfigError
 from webapp.scan_ingest import ingest_scan_report, get_recent_alerts, get_latest_devices
 
@@ -57,13 +59,35 @@ def signup():
     if request.method == "POST":
         try:
             user = do_signup(request.form["email"], request.form["password"])
-            session["user_id"] = user["id"]
-            session["email"] = user["email"]
-            flash("Account created. Head to the 'Get Agent' page any time to view your API key.", "success")
-            return redirect(url_for("router_setup"))
+            verify_url = url_for("verify_email", token=user["verify_token"], _external=True)
+            send_verification_email(user["email"], verify_url)
+            flash("Account created! Check your email for a verification link before logging in.", "success")
+            return redirect(url_for("login"))
         except AuthError as e:
             flash(str(e), "error")
     return render_template("signup.html")
+
+
+@app.route("/verify/<token>")
+def verify_email(token):
+    if verify_email_token(token):
+        flash("Email verified! You can log in now.", "success")
+    else:
+        flash("That verification link is invalid or has already been used.", "error")
+    return redirect(url_for("login"))
+
+
+@app.route("/resend-verification", methods=["POST"])
+def resend_verification_route():
+    email = request.form.get("email", "")
+    new_token = resend_verification(email)
+    if new_token:
+        verify_url = url_for("verify_email", token=new_token, _external=True)
+        send_verification_email(email, verify_url)
+    # Same message either way -- doesn't reveal whether that email has an
+    # account or is already verified, which is the correct, safe behavior.
+    flash("If that email has a pending account, a new verification link was sent.", "success")
+    return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
