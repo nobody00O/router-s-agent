@@ -21,7 +21,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask import Flask, request, session, redirect, url_for, jsonify, render_template, flash
 
 from webapp.db import init_db, DB_PATH
-from webapp.auth import signup as do_signup, login as do_login, AuthError, get_user_by_api_key
+from webapp.auth import signup as do_signup, login as do_login, AuthError, get_user_by_api_key, regenerate_api_key
 from webapp.router_config import save_router_config, get_router_config, ConfigError
 from webapp.scan_ingest import ingest_scan_report, get_recent_alerts, get_latest_devices
 
@@ -59,7 +59,7 @@ def signup():
             user = do_signup(request.form["email"], request.form["password"])
             session["user_id"] = user["id"]
             session["email"] = user["email"]
-            flash(f"Account created. Your API key (needed for the local agent): {user['api_key']}", "success")
+            flash("Account created. Head to the 'Get Agent' page any time to view your API key.", "success")
             return redirect(url_for("router_setup"))
         except AuthError as e:
             flash(str(e), "error")
@@ -128,6 +128,14 @@ def agent_download():
     with get_db() as conn:
         row = conn.execute("SELECT api_key FROM users WHERE id=?", (current_user_id(),)).fetchone()
     return render_template("agent.html", api_key=row["api_key"])
+
+
+@app.route("/agent/regenerate", methods=["POST"])
+@login_required
+def agent_regenerate():
+    new_key = regenerate_api_key(current_user_id())
+    flash("New API key issued and the old one is now dead. View it below and update local_agent.py.", "success")
+    return redirect(url_for("agent_download"))
 
 
 @app.route("/api/report", methods=["POST"])
