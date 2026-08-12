@@ -1,6 +1,8 @@
 """
 webapp/db.py
-SQLite database setup and connection helpers for NetGuard.
+SQLite is a single-file database -- perfect for a class project, though a
+real production deployment would move to Postgres/MySQL once you have
+concurrent users 
 
 The database stores users, router configurations, scan reports,
 and security alerts.
