@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Your local scanning agent</h2>
+  <p>This platform cannot see inside your home network by itself — the agent runs
+  <strong>on your own machine</strong>, scans your own network, and reports
+  results up to your dashboard here.</p>
+
+  <p>Your API key (keep this private — it authenticates the agent as you):</p>
+  <p>
+    <code id="apiKeyText" style="display:none;">{{ api_key }}</code>
+    <button type="button" onclick="document.getElementById('apiKeyText').style.display='inline'; this.style.display='none';">Click to reveal API key</button>
+  </p>
+
+  <form method="POST" action="{{ url_for('agent_regenerate') }}" onsubmit="return confirm('This invalidates your current key immediately. Any running agent will need the new one. Continue?');">
+    <button type="submit" style="background:#eb5757;">Regenerate API key (do this if it's ever been exposed)</button>
+  </form>
+
+  <h3>Setup</h3>
+  <ol>
+    <li>Download <code>agent/local_agent.py</code> from the project files.</li>
+    <li>Install its one dependency: <code>pip install requests scapy</code></li>
+    <li>Edit the top of the file: set <code>API_KEY</code> to the key above, and <code>SERVER_URL</code> to this site's address.</li>
+    <li>Run it with elevated privileges on your own network:<br>
+      <code>sudo python3 local_agent.py</code></li>
+  </ol>
+
+  <p style="color:#9fb3c8; font-size:0.85rem;">Only run this on a network you own or have explicit permission to scan.</p>
+</div>
+{% endblock %}

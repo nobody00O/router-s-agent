@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>Know if your router is being watched.</h1>
+  <p>Register your router's network specs, run a small local scan on your own
+  network, and get plain-English alerts if an unrecognized device joins or if
+  something on your network is sending data to a known tracker/telemetry
+  destination.</p>
+  <p><a href="{{ url_for('signup') }}"><button>Get started — Sign up</button></a></p>
+</div>
+<div class="card">
+  <h3>How it works</h3>
+  <ol>
+    <li>Sign up and register your router's subnet, interface, and known devices.</li>
+    <li>Download the small local scanning agent and run it on your own network.</li>
+    <li>The agent reports results here — your dashboard shows devices and alerts.</li>
+  </ol>
+  <p style="color:#9fb3c8; font-size:0.85rem;">Note: this site cannot scan your network by itself — no website can see inside your home network from the outside. The local agent does the actual scanning, on your machine, with your permission.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card" style="max-width:400px;">
+  <h2>Log in</h2>
+  <form method="POST">
+    <label>Email</label>
+    <input type="email" name="email" required>
+    <label>Password</label>
+    <input type="password" name="password" required>
+    <button type="submit">Log in</button>
+  </form>
+  <p style="font-size:0.85rem; color:#9fb3c8;">No account yet? <a href="{{ url_for('signup') }}" style="color:#3462ff;">Sign up</a></p>
+
+  <hr style="border-color:#262b36; margin:1.5rem 0;">
+  <p style="font-size:0.85rem; color:#9fb3c8;">Didn't get a verification email, or link expired?</p>
+  <form method="POST" action="{{ url_for('resend_verification_route') }}">
+    <input type="email" name="email" placeholder="your email" required>
+    <button type="submit" style="background:#333;">Resend verification email</button>
+  </form>
+</div>
+{% endblock %}
