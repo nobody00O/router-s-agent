@@ -7,7 +7,14 @@
   results up to your dashboard here.</p>
 
   <p>Your API key (keep this private — it authenticates the agent as you):</p>
-  <p><code>{{ api_key }}</code></p>
+  <p>
+    <code id="apiKeyText" style="display:none;">{{ api_key }}</code>
+    <button type="button" onclick="document.getElementById('apiKeyText').style.display='inline'; this.style.display='none';">Click to reveal API key</button>
+  </p>
+
+  <form method="POST" action="{{ url_for('agent_regenerate') }}" onsubmit="return confirm('This invalidates your current key immediately. Any running agent will need the new one. Continue?');">
+    <button type="submit" style="background:#eb5757;">Regenerate API key (do this if it's ever been exposed)</button>
+  </form>
 
   <h3>Setup</h3>
   <ol>
