@@ -1,4 +1,4 @@
-"""
+""
 webapp/db.py
 
 Plain sqlite3 (no ORM) so a 1st-year student can read every query directly.
@@ -25,6 +25,8 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     api_key TEXT UNIQUE NOT NULL,
+    email_verified INTEGER NOT NULL DEFAULT 0,
+    verify_token TEXT,
     created_at TEXT NOT NULL
 );
 
