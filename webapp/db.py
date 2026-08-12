@@ -1,11 +1,16 @@
-"""webapp/db.py
+""
+webapp/db.py
 
+Plain sqlite3 (no ORM) so a 1st-year student can read every query directly.
 SQLite is a single-file database -- perfect for a class project, though a
 real production deployment would move to Postgres/MySQL once you have
-concurrent users 
+concurrent users (see README limitations).
 
-The database stores users, router configurations, scan reports,
-and security alerts.
+Schema:
+  users            -- signup accounts (email, hashed password, API key)
+  router_configs   -- one row per user's registered router/network specs
+  scan_reports     -- a log of each scan the user's local agent submitted
+  alerts  
 """
 from __future__ import annotations
 import sqlite3
