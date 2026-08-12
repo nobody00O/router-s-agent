@@ -63,6 +63,18 @@ def get_user_by_api_key(api_key: str, db_path: str = None) -> dict | None:
     return {"id": row["id"], "email": row["email"]} if row else None
 
 
+def regenerate_api_key(user_id: int, db_path: str = None) -> str:
+    """Issues a brand new API key for a user and invalidates the old one
+    immediately -- use this if a key has been exposed (pasted somewhere
+    public, committed to a repo, etc). Any local_agent.py still using the
+    old key will start getting 401s until it's updated with the new one."""
+    new_key = secrets.token_hex(24)
+    kwargs = {"db_path": db_path} if db_path else {}
+    with get_db(**kwargs) as conn:
+        conn.execute("UPDATE users SET api_key = ? WHERE id = ?", (new_key, user_id))
+    return new_key
+
+
 if __name__ == "__main__":
     import os
     from webapp.db import init_db
