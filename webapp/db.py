@@ -1,4 +1,4 @@
-""
+"""
 webapp/db.py
 
 Plain sqlite3 (no ORM) so a 1st-year student can read every query directly.
